@@ -1,0 +1,88 @@
+/* Reuse base layout */
+.container-wrapper {
+    display: flex;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+    font-family: 'Lato', sans-serif;
+}
+
+.icon-tab {
+    width: 90px;
+    background-color: #633F5A;
+}
+
+.main-content {
+    flex: 1;
+    padding: 40px 60px;
+}
+
+/* Header */
+.options-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.heading {
+    font-size: 28px;
+    font-weight: bold;
+    color: #3f2a3d;
+    margin-left: 10px;
+}
+
+.Help-button {
+    background-color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px;
+    margin-left: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    cursor: pointer;
+}
+
+.help-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Form */
+.filter-form {
+    width: 100%;
+    max-width: 600px;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+}
+
+.input-container {
+    margin-bottom: 25px;
+}
+
+.label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.input-box {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-family: Lato;
+    font-size: 15px;
+}
+
+.dropdownbutton {
+    width: 140px;
+    height: 40px;
+    font-family: Lato;
+    border-radius: 20px;
+    border: 1px solid #3f3c3c;
+    background-color: #633F5A;
+    color: white;
+    cursor: pointer;
+}
