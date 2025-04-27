@@ -1,0 +1,34 @@
+<h2>Final Grade Report for {{ student.student_name }} in {{ course.course_name }}</h2>
+
+<table border="1" cellpadding="10" cellspacing="0">
+  <thead>
+    <tr>
+      <th>📂 Category</th>
+      <th>📈 Percentage</th>
+      <th>⚖️ Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, percent, weight in category_data %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>
+          {% if percent is not None %}
+            {{ percent|floatformat:2 }}%
+          {% else %}
+            <em>No Grades</em>
+          {% endif %}
+        </td>
+        <td>{{ weight }}%</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<br>
+
+{% if final_grade is not None %}
+  <h3>🎯 Final Weighted Grade: <strong>{{ final_grade|floatformat:2 }}%</strong></h3>
+{% else %}
+  <h3>⚠️ No final grade available yet.</h3>
+{% endif %}

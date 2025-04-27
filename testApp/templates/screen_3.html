@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+    <script src="{% static 'script.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'style_screen3.css' %}">
+    <title>Advisor Canvas</title>
+</head>
+<body>
+    <div class="container-wrapper">
+        <div class="icon-tab">
+            {% include 'index.html' %}
+        </div>
+
+        <div class="main-content">
+            <div class="options-header">
+                <div class="heading">Browse all CS Courses</div>
+                <div class="buttons-container">
+                    <button class="Help-button">
+                        <img src="{% static 'images/Bell.png' %}" alt="Notification" class="help-icon">
+                    </button>
+                    <button class="Help-button">
+                        <img src="{% static 'images/Menu.png' %}" alt="Menu" class="help-icon">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Smooth Custom Dropdown -->
+            <div class="custom-dropdown-wrapper">
+                <div class="custom-dropdown-toggle" onclick="toggleDropdown()">Select Term</div>
+                <ul class="custom-dropdown-menu" id="termList">
+                    {% for term in terms %}
+                        <li onclick="selectTerm('{{ term }}')">{{ term }}</li>
+                    {% endfor %}
+                </ul>
+                <input type="hidden" id="selectedTermInput" />
+            </div>
+
+            <a id="continueLink" class="continue-button-link">
+                <button class="dropdownbutton">Continue</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown() {
+            document.getElementById('termList').classList.toggle('show');
+        }
+
+        function selectTerm(term) {
+            document.querySelector('.custom-dropdown-toggle').innerText = term;
+            document.getElementById('selectedTermInput').value = term;
+            document.getElementById('termList').classList.remove('show');
+        }
+
+        document.getElementById('continueLink').addEventListener('click', function () {
+            const selectedTerm = document.getElementById('selectedTermInput').value;
+            if (!selectedTerm) return alert("Please select a term.");
+            const url = "{% url 'screen_4' %}?term=" + encodeURIComponent(selectedTerm);
+            window.location.href = url;
+        });
+
+        window.addEventListener('click', function (e) {
+            if (!e.target.closest('.custom-dropdown-wrapper')) {
+                document.getElementById('termList').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

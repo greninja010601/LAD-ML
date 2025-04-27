@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+    <script src="{% static 'script.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'style_screen1.css' %}">
+    <link rel="stylesheet" href="{% static 'style_screen2.css' %}">
+    <title>Advisor Canvas</title>
+</head>
+<body>
+
+    <div class="container-wrapper">
+        <!-- ✅ Sidebar -->
+        {% include 'index.html' %}
+
+        <!-- ✅ Main content starts here -->
+        <div class="main-content">
+            <div class="options-header">
+                <div class="heading">Advising Dashboard</div>
+                <div class="buttons-container">
+                    <button id="bell" class="Help-button">
+                        <img src="{% static 'images/Bell.png' %}" alt="Notification" class="help-icon">
+                    </button>
+                    <button id="Menu" class="Help-button">
+                        <img src="{% static 'images/Menu.png' %}" alt="Menu" class="help-icon">
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 50px;">
+                What would you like to do?
+            </div>
+
+            <div class="button-container">
+                <a style="text-decoration:none" href="{% url 'screen_3' %}">
+                    <button class="options-button">
+                        <img src="{% static 'images/Browse.png' %}" alt="Browse" class="icon1">
+                        <div class="text-container">
+                            <div class="options-text">Browse all CS Courses</div>
+                        </div>
+                    </button>
+                </a>
+                <button class="options-button">
+                    <img src="{% static 'images/Meeting.png' %}" alt="Schedule" class="icon1">
+                    <div class="text-container">
+                        <div class="options-text">Schedule Meeting</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
