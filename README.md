@@ -5,7 +5,7 @@ This project provides a dashboard integration for Canvas Learning Management Sys
 ## Features
 
 - LTI integration with Canvas LMS
-- Historical data storage using MySQL
+- Historical data storage using PostgreSQL
 - Instructor dashboard with analytics
 - Secure communication through SSL
 
@@ -14,8 +14,8 @@ This project provides a dashboard integration for Canvas Learning Management Sys
 - **Python 3.x**
 - **Django 4.1.1**: `pip install Django==4.1.1`
 - **Canvas LMS Account**: Instructor-level access to a Canvas Instructure LMS instance
-- **MySQL Server**: For storing historical data
-- **mysqlclient**: For Django-MySQL connectivity
+- **PostgreSQL**: For storing historical data
+- **psycopg2-binary**: For Django-PostgreSQL connectivity
 - **django-sslserver**: For secure local development
 
 ## Installation and Setup
@@ -48,30 +48,63 @@ pip install -r requirements.txt
 
 # If requirements.txt is not available, install these packages:
 pip install Django==4.1.1
-pip install mysqlclient
 pip install django-sslserver
+pip install psycopg2-binary  # PostgreSQL driver
 ```
 
 ### 4. Database Configuration
 
-#### MySQL Setup
+#### PostgreSQL Setup
 
-1. Install MySQL Server on your machine if not already installed
-2. Create a new database for the project
-3. Configure Django to use MySQL by updating the `DATABASES` setting in `settings.py`:
+1. Install PostgreSQL:
+   
+   **On Ubuntu/Debian:**
+   ```bash
+   sudo apt update
+   sudo apt install postgresql postgresql-contrib
+   ```
+   
+   **On macOS (using Homebrew):**
+   ```bash
+   brew install postgresql
+   brew services start postgresql
+   ```
+   
+   **On Windows:**
+   Download and install from the [official PostgreSQL website](https://www.postgresql.org/download/windows/)
 
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'yourdbname',
-        'USER': 'yourusername',
-        'PASSWORD': 'yourpassword',
-        'HOST': 'localhost',  # Or an IP Address where your DB is hosted
-        'PORT': '3306',
-    }
-}
-```
+2. Create a database and user:
+   
+   ```bash
+   # Log in to PostgreSQL as the postgres user
+   sudo -u postgres psql
+   
+   # Create a database
+   CREATE DATABASE yourdbname;
+   
+   # Create a user with password
+   CREATE USER yourusername WITH PASSWORD 'yourpassword';
+   
+   # Grant privileges to the user
+   GRANT ALL PRIVILEGES ON DATABASE yourdbname TO yourusername;
+   
+   # Exit PostgreSQL
+   \q
+   ```
+
+3. Configure Django to use PostgreSQL by updating the `DATABASES` setting in `settings.py`:
+   ```python
+   DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'yourdbname',
+           'USER': 'yourusername',
+           'PASSWORD': 'yourpassword',
+           'HOST': 'localhost',
+           'PORT': '5432',
+       }
+   }
+   ```
 
 4. Apply database migrations:
 
