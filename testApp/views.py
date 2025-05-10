@@ -137,9 +137,76 @@ def screen_7(request, course_id, course_name, student_name,user_id):
     screen_data = retrieve_data(course_id, course_name, student_name,user_id)
     return render(request, 'screen_7.html', screen_data)
 
-def screen_8(request, course_id, course_name, student_name,user_id):
-    screen_data = retrieve_data(course_id, course_name, student_name, user_id)
-    return render(request, 'screen_8.html', screen_data)
+def screen_8(request, course_id, course_name, student_name, user_id):
+    import pandas as pd
+    import joblib
+    from .models import Course, Student, Enrollment
+
+    accuracy_20 = round(0.607 * 100, 2)  # → 87.2%
+    accuracy_50 = round(0.915 * 100, 2)  # → 91.5%
+
+    course = Course.objects.get(course_id=course_id)
+    student = Student.objects.get(student_id=user_id)
+
+    predicted_score = None
+    prediction_message = ""
+    is_loading = False
+
+    prediction_type = request.POST.get('prediction_type') or request.GET.get('prediction_type')
+
+    if request.method == "POST":
+        is_loading = True  # Start loading
+
+        if prediction_type in ['20', '50'] and "data structures" in course.course_name.lower():
+            try:
+                model = joblib.load(f'cs165_combined_model_{prediction_type}_groupname.pkl')
+
+                feature_dict = extract_student_features_by_group_name(
+                    student_id=student.student_id,
+                    course_id=course.course_id,
+                    progress_ratio=float(prediction_type) / 100
+                )
+                feature_df = pd.DataFrame([feature_dict])
+
+                expected_features = model.get_booster().feature_names
+                for col in expected_features:
+                    if col not in feature_df.columns:
+                        feature_df[col] = 0
+                feature_df = feature_df[expected_features]
+
+                predicted_score = round(model.predict(feature_df)[0], 2)
+                is_loading = False  # Stop loading after success
+            except Exception as e:
+                prediction_message = f"❌ Prediction failed: {str(e)}"
+                is_loading = False
+        else:
+            prediction_message = "🚫 Prediction available only for Data Structures (CS165)."
+            is_loading = False
+
+    try:
+        grade_info = Enrollment.objects.get(student=student, course=course)
+    except Enrollment.DoesNotExist:
+        grade_info = None
+
+    return render(request, 'screen_8.html', {
+        'student_name': student_name,
+        'course_id': course_id,
+        'course_name': course_name,
+        'user_id': user_id,
+        'grade_info': grade_info,
+        'predicted_score': predicted_score,
+        'prediction_type': prediction_type,
+        'prediction_message': prediction_message,
+        'is_loading': is_loading,
+        'accuracy_20': accuracy_20,
+        'accuracy_50': accuracy_50
+    })
+
+
+
+
+
+
 
 def screen_9(request, course_id, course_name, student_name, user_id):
 
@@ -698,7 +765,7 @@ def sync_canvas_data():
 from dateutil.parser import parse  # ✅ Correct import
 def sync_cs152_data(request):
     TOKEN = "3716~eFecnK3f2cDrkawtPCRPvVJCLvNDUE2yZZDkKZDWEv4uH36vrzCEeJf4T4QrhNQW"  # 🔁 Replace with actual token
-    COURSE_ID = 177318  # CS152 course ID
+    COURSE_ID = 186019 # CS152 course ID
     BASE_URL = "https://colostate.instructure.com/api/v1"
     headers = {"Authorization": f"Bearer {TOKEN}"}
 
@@ -850,6 +917,38 @@ def test_canvas_course_access(request):
 
 
 
+from collections import defaultdict
+from datetime import timedelta
+
+def extract_student_features_by_group_name(student_id, course_id, progress_ratio):
+    course = Course.objects.get(course_id=course_id)
+    duration = (course.end_date - course.start_date).days
+    cutoff = course.start_date + timedelta(days=int(duration * progress_ratio))
+
+    assignment_groups = AssignmentGroup.objects.filter(course=course)
+    group_id_to_name = {g.group_id: g.name for g in assignment_groups}
+
+    assignments = Assignment.objects.filter(course=course, due_at__lte=cutoff)
+    grades = Grade.objects.filter(student__student_id=student_id, assignment_id__in=assignments.values_list('assignment_id', flat=True))
+
+    features = defaultdict(float)
+    totals = defaultdict(float)
+
+    for grade in grades:
+        if not grade.assignment.assignment_group:
+            continue
+        group_id = grade.assignment.assignment_group.group_id
+        group_name = group_id_to_name.get(group_id)
+        if group_name and grade.assignment.points_possible:
+            features[group_name] += grade.score or 0
+            totals[group_name] += grade.assignment.points_possible
+
+    final_features = {}
+    for group_name in features:
+        total_possible = totals[group_name]
+        final_features[group_name] = (features[group_name] / total_possible) if total_possible > 0 else 0
+
+    return final_features
 
 
 def sync_view(request):
